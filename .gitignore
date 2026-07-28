@@ -1,0 +1,17 @@
+# Build output
+**/bin/
+**/obj/
+
+# Visual Studio / Rider / VS Code local
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+
+# Claude Code local context (not for the published repo)
+CLAUDE.md
+
+# Secrets / local environment
+.env*
+*.pfx

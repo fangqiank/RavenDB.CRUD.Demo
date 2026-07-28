@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 760" font-family="Arial, 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="skyGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#0ea5e9"/><stop offset="100%" stop-color="#0284c7"/></linearGradient>
+    <linearGradient id="purpleGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient>
+    <linearGradient id="orangeGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#ea580c"/></linearGradient>
+    <linearGradient id="blueGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
+    <linearGradient id="greenGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient>
+
+    <marker id="arrowSky" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a855f7"/></marker>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f97316"/></marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#22c55e"/></marker>
+
+    <style>
+      .flow { stroke-dasharray: 9,5; animation: dash 0.6s linear infinite; }
+      @keyframes dash { to { stroke-dashoffset: -14; } }
+      @media (prefers-reduced-motion: reduce) { .flow { animation: none; } }
+    </style>
+  </defs>
+
+  <rect width="1240" height="760" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="620" y="46" text-anchor="middle" font-size="26" font-weight="bold" fill="#0f172a">RavenDB CRUD Demo · 架构图</text>
+  <text x="620" y="74" text-anchor="middle" font-size="15" fill="#64748b">ASP.NET Core 10 Minimal API + RavenDB — request / data flow</text>
+
+  <!-- ============ MAIN PIPELINE (y=150, h=150) ============ -->
+  <!-- C1 Client -->
+  <g transform="translate(30,150)">
+    <rect width="200" height="150" rx="12" fill="#f1f5f9" stroke="#0ea5e9" stroke-width="2"/>
+    <rect width="200" height="34" rx="12" fill="url(#skyGradient)"/>
+    <rect y="22" width="200" height="12" fill="url(#skyGradient)"/>
+    <text x="100" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">HTTP 客户端 / Client</text>
+    <text x="100" y="66" text-anchor="middle" font-size="12" fill="#334155">Scalar · curl · 浏览器</text>
+    <text x="100" y="88" text-anchor="middle" font-size="11" fill="#64748b">REST 请求 (JSON)</text>
+    <text x="100" y="112" text-anchor="middle" font-size="11" fill="#64748b">/api/products</text>
+    <text x="100" y="130" text-anchor="middle" font-size="11" fill="#64748b">/api/relationships</text>
+  </g>
+
+  <!-- C2 Program.cs -->
+  <g transform="translate(275,150)">
+    <rect width="200" height="150" rx="12" fill="#faf5ff" stroke="#a855f7" stroke-width="2"/>
+    <rect width="200" height="34" rx="12" fill="url(#purpleGradient)"/>
+    <rect y="22" width="200" height="12" fill="url(#purpleGradient)"/>
+    <text x="100" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">Program.cs</text>
+    <text x="100" y="66" text-anchor="middle" font-size="12" fill="#334155">Minimal API 宿主</text>
+    <text x="100" y="88" text-anchor="middle" font-size="11" fill="#64748b">DI 注册 RavenDBService</text>
+    <text x="100" y="110" text-anchor="middle" font-size="11" fill="#64748b">映射路由组</text>
+    <text x="100" y="132" text-anchor="middle" font-size="11" fill="#64748b">启动执行索引</text>
+  </g>
+
+  <!-- C3 Endpoints -->
+  <g transform="translate(520,150)">
+    <rect width="200" height="150" rx="12" fill="#faf5ff" stroke="#a855f7" stroke-width="2"/>
+    <rect width="200" height="34" rx="12" fill="url(#purpleGradient)"/>
+    <rect y="22" width="200" height="12" fill="url(#purpleGradient)"/>
+    <text x="100" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">Endpoints</text>
+    <text x="100" y="64" text-anchor="middle" font-size="11" fill="#334155">ProductEndpoints</text>
+    <text x="100" y="82" text-anchor="middle" font-size="11" fill="#334155">RelationshipEndpoints</text>
+    <text x="100" y="108" text-anchor="middle" font-size="11" fill="#64748b">CRUD · 搜索 · 关系查询</text>
+    <text x="100" y="128" text-anchor="middle" font-size="11" fill="#64748b">委托给 RavenDBService</text>
+  </g>
+
+  <!-- C4 RavenDBService -->
+  <g transform="translate(765,150)">
+    <rect width="200" height="150" rx="12" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+    <rect width="200" height="34" rx="12" fill="url(#orangeGradient)"/>
+    <rect y="22" width="200" height="12" fill="url(#orangeGradient)"/>
+    <text x="100" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">RavenDBService</text>
+    <text x="100" y="64" text-anchor="middle" font-size="11" fill="#334155">Singleton · IDocumentStore</text>
+    <text x="100" y="86" text-anchor="middle" font-size="11" fill="#64748b">每方法开一个 Session</text>
+    <text x="100" y="106" text-anchor="middle" font-size="11" fill="#64748b">Store / Load / Query</text>
+    <text x="100" y="126" text-anchor="middle" font-size="11" fill="#64748b">Include 去冗余往返</text>
+  </g>
+
+  <!-- C5 RavenDB Server -->
+  <g transform="translate(1010,150)">
+    <rect width="200" height="150" rx="12" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+    <rect width="200" height="34" rx="12" fill="url(#blueGradient)"/>
+    <rect y="22" width="200" height="12" fill="url(#blueGradient)"/>
+    <text x="100" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">RavenDB Server</text>
+    <text x="100" y="66" text-anchor="middle" font-size="12" fill="#334155">ProductDB</text>
+    <text x="100" y="90" text-anchor="middle" font-size="11" fill="#64748b">文档数据库 (NoSQL)</text>
+    <text x="100" y="114" text-anchor="middle" font-size="11" fill="#64748b">自动建库 (EnsureExists)</text>
+    <text x="100" y="134" text-anchor="middle" font-size="11" fill="#64748b">自动索引</text>
+  </g>
+
+  <!-- ============ FLOW LINES (main pipeline) y=225 ============ -->
+  <path d="M230,225 L275,225" stroke="#e0f2fe" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M230,225 L275,225" class="flow" stroke="#0ea5e9" stroke-width="3" fill="none" marker-end="url(#arrowSky)" stroke-linecap="round"/>
+  <path d="M475,225 L520,225" stroke="#f3e8ff" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M475,225 L520,225" class="flow" stroke="#a855f7" stroke-width="3" fill="none" marker-end="url(#arrowPurple)" stroke-linecap="round"/>
+  <path d="M720,225 L765,225" stroke="#f3e8ff" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M720,225 L765,225" class="flow" stroke="#a855f7" stroke-width="3" fill="none" marker-end="url(#arrowPurple)" stroke-linecap="round"/>
+  <path d="M965,225 L1010,225" stroke="#ffedd5" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M965,225 L1010,225" class="flow" stroke="#f97316" stroke-width="3" fill="none" marker-end="url(#arrowOrange)" stroke-linecap="round"/>
+
+  <!-- ============ SUPPORTING MODULES (y=400) ============ -->
+  <!-- Models -->
+  <g transform="translate(275,400)">
+    <rect width="360" height="110" rx="12" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+    <rect width="360" height="34" rx="12" fill="url(#greenGradient)"/>
+    <rect y="22" width="360" height="12" fill="url(#greenGradient)"/>
+    <text x="180" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">Models · 数据模型</text>
+    <text x="180" y="62" text-anchor="middle" font-size="12" fill="#334155">Product · Customer(+Address) · Order(+OrderItem) · Review</text>
+    <text x="180" y="86" text-anchor="middle" font-size="11" fill="#64748b">camelCase JSON · 引用(*Id) + 冗余快照(ProductName/CustomerName)</text>
+  </g>
+
+  <!-- Indexes -->
+  <g transform="translate(685,400)">
+    <rect width="280" height="110" rx="12" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+    <rect width="280" height="34" rx="12" fill="url(#orangeGradient)"/>
+    <rect y="22" width="280" height="12" fill="url(#orangeGradient)"/>
+    <text x="140" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">Indexes · 索引</text>
+    <text x="140" y="62" text-anchor="middle" font-size="12" fill="#334155">Products_ByCategory</text>
+    <text x="140" y="86" text-anchor="middle" font-size="11" fill="#64748b">静态 Map 索引 · 启动时执行</text>
+  </g>
+
+  <!-- Connections from supporting to pipeline (dashed green/orange) -->
+  <path d="M455,400 L620,300" stroke="#dcfce7" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M455,400 L620,300" class="flow" stroke="#22c55e" stroke-width="2.5" fill="none" marker-end="url(#arrowGreen)" stroke-linecap="round"/>
+  <text x="500" y="345" font-size="10" fill="#16a34a">绑定</text>
+
+  <path d="M825,400 L865,300" stroke="#ffedd5" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M825,400 L865,300" class="flow" stroke="#f97316" stroke-width="2.5" fill="none" marker-end="url(#arrowOrange)" stroke-linecap="round"/>
+  <text x="840" y="345" font-size="10" fill="#ea580c">执行</text>
+
+  <!-- ============ PROCESS DESCRIPTION (bottom-left) ============ -->
+  <g transform="translate(30,560)">
+    <rect width="560" height="170" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="20" y="30" font-size="14" font-weight="bold" fill="#0f172a">请求处理流程 · Request Flow</text>
+    <text x="20" y="58" font-size="12" fill="#334155">1. 客户端发 HTTP 请求到 Minimal API 路由组</text>
+    <text x="20" y="80" font-size="12" fill="#334155">2. Endpoints 把请求委托给 RavenDBService</text>
+    <text x="20" y="102" font-size="12" fill="#334155">3. Service 开 Session：Store / Load / Query / Include</text>
+    <text x="20" y="124" font-size="12" fill="#334155">4. SaveChangesAsync 持久化到 RavenDB ProductDB</text>
+    <text x="20" y="146" font-size="12" fill="#334155">5. 返回 JSON（枚举以字符串序列化）</text>
+  </g>
+
+  <!-- ============ LEGEND (bottom-right) ============ -->
+  <g transform="translate(640,560)">
+    <rect width="570" height="170" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="20" y="30" font-size="14" font-weight="bold" fill="#0f172a">图例 · Legend</text>
+    <rect x="20" y="46" width="16" height="16" rx="3" fill="url(#skyGradient)"/><text x="46" y="59" font-size="12" fill="#334155">Client 客户端</text>
+    <rect x="200" y="46" width="16" height="16" rx="3" fill="url(#purpleGradient)"/><text x="226" y="59" font-size="12" fill="#334155">API 接口层 (Minimal API)</text>
+    <rect x="400" y="46" width="16" height="16" rx="3" fill="url(#orangeGradient)"/><text x="426" y="59" font-size="12" fill="#334155">Service 处理层</text>
+    <rect x="20" y="74" width="16" height="16" rx="3" fill="url(#greenGradient)"/><text x="46" y="87" font-size="12" fill="#334155">Models 数据模型</text>
+    <rect x="200" y="74" width="16" height="16" rx="3" fill="url(#blueGradient)"/><text x="226" y="87" font-size="12" fill="#334155">Database 存储</text>
+    <line x1="20" y1="118" x2="60" y2="118" class="flow" stroke="#64748b" stroke-width="3" stroke-dasharray="9,5"/>
+    <text x="70" y="122" font-size="12" fill="#334155">流动的虚线 = 实时请求/数据流（浏览器中查看 .svg 可见动画）</text>
+    <text x="20" y="150" font-size="11" fill="#64748b">技术栈：.NET 10 · RavenDB.Client 7.2 · Scalar.AspNetCore · System.Text.Json</text>
+  </g>
+</svg>
