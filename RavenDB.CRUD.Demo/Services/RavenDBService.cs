@@ -4,6 +4,8 @@ using Raven.Client.Documents.Session;
 using Raven.Client.Exceptions;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
+using RavenDB.CRUD.Demo.Exceptions;
+using RavenDB.CRUD.Demo.Indexes;
 using RavenDB.CRUD.Demo.Models;
 
 namespace RavenDB.CRUD.Demo.Services
@@ -64,12 +66,13 @@ namespace RavenDB.CRUD.Demo.Services
             return product;
         }
 
-        public async Task<List<Product>> GetAllProductsAsync()
+        public async Task<List<Product>> GetAllProductsAsync(int limit = 100)
         {
             using var session = OpenSession();
 
             var products = await session
                 .Query<Product>()
+                .Take(limit)
                 .ToListAsync();
 
             return products;
@@ -90,7 +93,7 @@ namespace RavenDB.CRUD.Demo.Services
             using var session = OpenSession();
 
             var products = await session
-                .Query<Product>()
+                .Query<Product, Products_ByCategory>()
                 .Where(p => p.Category == category)
                 .ToListAsync();
 
@@ -154,21 +157,21 @@ namespace RavenDB.CRUD.Demo.Services
 
             var customer = await session.LoadAsync<Customer>(order.CustomerId);
             if(customer == null)
-                throw new Exception($"Customer with ID {order.CustomerId} not found.");
+                throw new EntityNotFoundException($"Customer with ID {order.CustomerId} not found.");
 
             foreach (var item in order.Items)
             {
                 var product = await session.LoadAsync<Product>(item.ProductId);
                 if (product == null)
-                    throw new Exception($"Product with ID {item.ProductId} not found");
+                    throw new EntityNotFoundException($"Product with ID {item.ProductId} not found");
 
                 item.ProductName = product.Name;
                 if (item.UnitPrice == 0)
                     item.UnitPrice = product.Price;
             }
 
-            order.Customer = customer;
-            order.OrderNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid():N}".Substring(0, 20);
+            order.CustomerName = $"{customer.FirstName} {customer.LastName}";
+            order.OrderNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid():N}";
             order.TotalAmount = order.Items.Sum(i => i.Subtotal);
             order.ShippingAddress = customer.Address; // 使用客户地址作为默认
             order.CreatedAt = DateTime.UtcNow;
@@ -205,6 +208,10 @@ namespace RavenDB.CRUD.Demo.Services
         public async Task<List<Order>> GetOrdersByCustomerAsync(string customerId)
         {
             using var session = OpenSession();
+
+            var existingCustomer = await session.LoadAsync<Customer>(customerId);
+            if (existingCustomer == null)
+                throw new EntityNotFoundException($"Customer with ID {customerId} not found");
 
             var orders = await session
                 .Query<Order>()
@@ -266,9 +273,9 @@ namespace RavenDB.CRUD.Demo.Services
             var customer = await session.LoadAsync<Customer>(review.CustomerId);
 
             if (product == null)
-                throw new Exception($"Product with ID {review.ProductId} not found");
+                throw new EntityNotFoundException($"Product with ID {review.ProductId} not found");
             if (customer == null)
-                throw new Exception($"Customer with ID {review.CustomerId} not found");
+                throw new EntityNotFoundException($"Customer with ID {review.CustomerId} not found");
 
             review.ProductName = product.Name;
             review.CustomerName = $"{customer.FirstName} {customer.LastName}";
@@ -294,7 +301,7 @@ namespace RavenDB.CRUD.Demo.Services
 
             var customer = await session.LoadAsync<Customer>(customerId);
             if (customer == null)
-                throw new Exception($"Customer with ID {customerId} not found");
+                throw new EntityNotFoundException($"Customer with ID {customerId} not found");
 
             var orders = await session
                 .Query<Order>()
@@ -349,10 +356,10 @@ namespace RavenDB.CRUD.Demo.Services
             return customer;
         }
 
-        public async Task<List<Customer>> GetAllCustomersAsync()
+        public async Task<List<Customer>> GetAllCustomersAsync(int limit = 100)
         {
             using var session = OpenSession();
-            return await session.Query<Customer>().ToListAsync();
+            return await session.Query<Customer>().Take(limit).ToListAsync();
         }
 
         public async Task<Customer?> GetCustomerByIdAsync(string id)

@@ -1,4 +1,5 @@
-﻿using RavenDB.CRUD.Demo.Models;
+﻿using RavenDB.CRUD.Demo.Exceptions;
+using RavenDB.CRUD.Demo.Models;
 using RavenDB.CRUD.Demo.Services;
 
 namespace RavenDB.CRUD.Demo.Endpoints
@@ -12,14 +13,19 @@ namespace RavenDB.CRUD.Demo.Endpoints
 
             group.MapPost("/orders", async (Order order, RavenDBService dbService) =>
             {
+                if (order.Items is null || order.Items.Count == 0)
+                    return Results.BadRequest("订单必须包含至少一个商品");
+                if (order.Items.Any(i => i.Quantity <= 0))
+                    return Results.BadRequest("订单商品数量必须大于 0");
+
                 try
                 {
                     var created = await dbService.CreateOrderWithRelationsAsync(order);
-                    return Results.Created($"/api/relationships/orders/{created.Id}", created);
+                    return Results.Created($"/api/relationships/orders/{Uri.EscapeDataString(created.Id!)}", created);
                 }
-                catch (Exception ex)
+                catch (EntityNotFoundException ex)
                 {
-                    return Results.BadRequest(new { Error = ex.Message });
+                    return Results.NotFound(new { Error = ex.Message });
                 }
             })
             .WithName("CreateOrderWithRelations")
@@ -35,8 +41,15 @@ namespace RavenDB.CRUD.Demo.Endpoints
 
             group.MapGet("/customers/{customerId}/orders", async (string customerId, RavenDBService dbService) =>
             {
-                var orders = await dbService.GetOrdersByCustomerAsync(Uri.UnescapeDataString(customerId));
-                return Results.Ok(orders);
+                try
+                {
+                    var orders = await dbService.GetOrdersByCustomerAsync(Uri.UnescapeDataString(customerId));
+                    return Results.Ok(orders);
+                }
+                catch (EntityNotFoundException ex)
+                {
+                    return Results.NotFound(new { Error = ex.Message });
+                }
             })
             .WithName("GetCustomerOrders")
             .WithDescription("获取指定客户的所有订单");
@@ -51,14 +64,17 @@ namespace RavenDB.CRUD.Demo.Endpoints
 
             group.MapPost("/reviews", async (Review review, RavenDBService dbService) =>
             {
+                if (review.Rating < 1 || review.Rating > 5)
+                    return Results.BadRequest("评分必须在 1-5 之间");
+
                 try
                 {
                     var created = await dbService.CreateReviewAsync(review);
-                    return Results.Created($"/api/relationships/reviews/{created.Id}", created);
+                    return Results.Created($"/api/relationships/reviews/{Uri.EscapeDataString(created.Id!)}", created);
                 }
-                catch (Exception ex)
+                catch (EntityNotFoundException ex)
                 {
-                    return Results.BadRequest(new { Error = ex.Message });
+                    return Results.NotFound(new { Error = ex.Message });
                 }
             })
             .WithName("CreateReview")
@@ -71,7 +87,7 @@ namespace RavenDB.CRUD.Demo.Endpoints
                     var history = await dbService.GetCustomerPurchaseHistoryAsync(Uri.UnescapeDataString(customerId));
                     return Results.Ok(history);
                 }
-                catch (Exception ex)
+                catch (EntityNotFoundException ex)
                 {
                     return Results.NotFound(new { Error = ex.Message });
                 }
@@ -90,6 +106,11 @@ namespace RavenDB.CRUD.Demo.Endpoints
 
         private static async Task SeedData(RavenDBService dbService)
         {
+            // 幂等：若已存在种子产品则跳过，避免重复调用产生重复记录
+            var existing = await dbService.GetAllProductsAsync();
+            if (existing.Any(p => p.Name == "iPhone 15 Pro"))
+                return;
+
             var customers = new List<Customer>
         {
             new()

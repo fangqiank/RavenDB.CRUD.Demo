@@ -72,7 +72,7 @@ POST /api/relationships/seed
 
 ## Conventions worth knowing
 
-- **Document IDs contain `/`** (e.g. `products/1-A`), so terminal id routes use a catch-all `{*id}` plus `Uri.UnescapeDataString(id)` — ASP.NET does not auto-decode `%2F` in route values. Clients (Scalar, curl) typically send the encoded form.
+- **Document IDs contain `/`** (e.g. `products/1-A`), so terminal id routes use a catch-all `{*id}` plus `Uri.UnescapeDataString(id)` — ASP.NET does not auto-decode `%2F` in route values. Clients (Scalar, curl) typically send the encoded form. **Note:** only *terminal* id routes accept a raw slash; **middle-segment** routes such as `/customers/{customerId}/orders` require the encoded form (`customers%2F1-A`) — a raw slash would add an extra path segment and 404.
 - **Full-text search** uses `.Search()`, not `string.Contains()` (RavenDB's LINQ provider rejects substring `Contains`).
 - **Enums** (`OrderStatus`) serialize as strings via `JsonStringEnumConverter`.
 - `PUT /api/products/{id}` is a **full replacement** of `name`/`description`/`price`/`category`/`inStock` — omitted fields reset to defaults.

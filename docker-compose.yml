@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  ravendb:
+    container_name: ravendb
+    image: ravendb/ravendb:latest
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"      # HTTP 端口
+      - "38888:38888"    # TCP 集群通信端口
+
+    volumes:
+      # 请将 /home/yourusername 替换为 LXC 容器内的实际路径
+      - /home/yourusername/ravendb/data:/var/lib/ravendb/data
+
+    environment:
+      # 1. 接受许可协议
+      - RAVEN_License_Eula_Accepted=true
+      # 2. 跳过安装向导
+      - RAVEN_Setup_Mode=None
+      
+      # 3. 关键：允许公共网络进行非加密访问 (开发/测试用)
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
+      
+      # 4. HTTP 和 TCP 的网络配置
+      - RAVEN_ServerUrl=http://0.0.0.0:8080
+      - RAVEN_PublicServerUrl=http://your-lxc-ip:8080 # 请替换为你的 LXC 容器的实际 IP
+      - RAVEN_ServerUrl_Tcp=tcp://0.0.0.0:38888
+      - RAVEN_PublicServerUrl_Tcp=tcp://your-lxc-ip:38888 # 请替换为你的 LXC 容器的实际 IP
+      
+      # 5. (可选) 填入你的 License，未填入则使用社区版限制
+      # - RAVEN_License='Your-License-JSON-Here'

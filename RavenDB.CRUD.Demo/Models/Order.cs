@@ -14,7 +14,10 @@ namespace RavenDB.CRUD.Demo.Models
         public string CustomerId { get; set; } = string.Empty;  // 引用 Customer
 
         [JsonPropertyName("customer")]
-        public Customer? Customer { get; set; }  // 嵌套的 Customer 信息（可选）
+        public Customer? Customer { get; set; }  // 读时水化（Include），不持久化整对象
+
+        [JsonPropertyName("customerName")]
+        public string? CustomerName { get; set; }  // 冗余存储，方便显示
 
         [JsonPropertyName("orderDate")]
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
@@ -58,11 +61,11 @@ namespace RavenDB.CRUD.Demo.Models
         [JsonPropertyName("unitPrice")]
         public decimal UnitPrice { get; set; }
 
-        [JsonPropertyName("subtotal")]
-        public decimal Subtotal => Quantity * UnitPrice;
-
         [JsonPropertyName("discount")]
-        public decimal Discount { get; set; }
+        public decimal Discount { get; set; }  // 单件折扣金额（per-unit discount amount）
+
+        [JsonPropertyName("subtotal")]
+        public decimal Subtotal => Quantity * (UnitPrice - Discount);
     }
 
     public enum OrderStatus

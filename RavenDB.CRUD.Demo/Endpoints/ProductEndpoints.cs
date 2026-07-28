@@ -10,9 +10,9 @@ namespace RavenDB.CRUD.Demo.Endpoints
             var group = app.MapGroup("/api/products")
                 .WithTags("Products");
 
-            group.MapGet("/", async (RavenDBService dbService) =>
+            group.MapGet("/", async (RavenDBService dbService, int limit = 100) =>
             {
-                var products = await dbService.GetAllProductsAsync();
+                var products = await dbService.GetAllProductsAsync(limit);
                 return Results.Ok(products);
             })
             .WithName("GetAllProducts")
@@ -36,6 +36,9 @@ namespace RavenDB.CRUD.Demo.Endpoints
 
             group.MapGet("/search", async (string q, RavenDBService dbService) =>
             {
+                if (string.IsNullOrWhiteSpace(q))
+                    return Results.BadRequest("搜索关键词 q 不能为空");
+
                 var products = await dbService.SearchProductsAsync(q);
                 return Results.Ok(products);
             })
@@ -46,9 +49,11 @@ namespace RavenDB.CRUD.Demo.Endpoints
             {
                 if (string.IsNullOrEmpty(product.Name))
                     return Results.BadRequest("产品名称不能为空");
+                if (product.Price < 0)
+                    return Results.BadRequest("产品价格不能为负数");
 
                 var created = await dbService.CreateProductAsync(product);
-                return Results.Created($"/api/products/{created.Id}", created);
+                return Results.Created($"/api/products/{Uri.EscapeDataString(created.Id!)}", created);
             })
             .WithName("CreateProduct")
             .WithDescription("创建新产品");
@@ -57,6 +62,8 @@ namespace RavenDB.CRUD.Demo.Endpoints
             {
                 if (string.IsNullOrEmpty(updatedProduct.Name))
                     return Results.BadRequest("产品名称不能为空");
+                if (updatedProduct.Price < 0)
+                    return Results.BadRequest("产品价格不能为负数");
 
                 var updated = await dbService.UpdateProductAsync(Uri.UnescapeDataString(id), updatedProduct);
                 return updated is not null ? Results.Ok(updated) : Results.NotFound();
